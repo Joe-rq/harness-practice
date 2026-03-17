@@ -1,0 +1,51 @@
+# Pre-commit hook 配置
+# 安装: pip install pre-commit && pre-commit install
+
+repos:
+  # Python linters
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  # Python formatting
+  - repo: https://github.com/psf/black
+    rev: 24.1.0
+    hooks:
+      - id: black
+        language_version: python3.10
+
+  # Python linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: ['--max-line-length=100', '--ignore=E501,W503']
+
+  # Harness Architecture Lint
+  - repo: local
+    hooks:
+      - id: architecture-lint
+        name: Harness Architecture Lint
+        entry: python skills/architecture-lint/scripts/run_all.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: harness-code-review
+        name: Harness Code Review
+        entry: python skills/code-review/scripts/run_review.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-commit]
+        args: ['--files', 'src/']
+        verbose: true

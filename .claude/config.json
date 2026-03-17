@@ -19,6 +19,16 @@
       "command": "python",
       "args": ["-m", "mcp_server_sqlite", "--db-path", "./.harness/data.db"],
       "description": "SQLite 数据库 - 存储进度和元数据"
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"],
+      "description": "Git 操作 - 读取 git 历史、状态"
+    },
+    "search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-search"],
+      "description": "代码搜索 - 跨文件搜索"
     }
   },
   "tools": {
@@ -31,20 +41,31 @@
     },
     "Read": {
       "enabled": true,
-      "allowedDirectories": ["./src", "./docs", "./.harness"]
+      "allowedDirectories": ["./src", "./docs", "./.harness", "./skills"]
     },
     "Write": {
       "enabled": true,
       "allowedDirectories": ["./src", "./docs", "./.harness"]
+    },
+    "Glob": {
+      "enabled": true
+    },
+    "Grep": {
+      "enabled": true
     }
   },
   "hooks": {
     "preCommit": [
-      "make lint",
-      "make test"
+      "python skills/architecture-lint/scripts/run_all.py",
+      "python skills/code-review/scripts/run_review.py --files src/"
     ],
     "postReview": [
-      "make report"
+      "python skills/cleanup/scripts/cleanup.py --check-only"
     ]
+  },
+  "harness": {
+    "config": ".harness/config.yaml",
+    "progressDir": ".harness/progress",
+    "reviewDir": ".harness/reviews"
   }
 }

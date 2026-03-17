@@ -9,10 +9,18 @@
 - Node.js 18+
 - Python 3.10+
 
-### 启动
+### 安装
 ```bash
+# 克隆项目
+git clone https://github.com/Joe-rq/harness-practice.git
+cd harness-practice
+
 # 安装依赖
-npm install
+pip install -r examples/drg-helper/requirements.txt
+pip install vulture black flake8 pre-commit
+
+# 安装 pre-commit hooks
+pre-commit install
 
 # 启动 Claude Code
 claude
@@ -24,102 +32,84 @@ claude
 .
 ├── AGENTS.md                      # ← 入口：目录地图
 ├── .claude/
-│   └── config.json                # MCP 配置
+│   └── config.json                # ← MCP 配置（含6个工具）
 ├── .harness/
 │   ├── config.yaml               # Harness 全局配置
-│   └── progress/                 # 任务进度追踪
-├── skills/                        # ← Skill 定义（符合 AgentSkills 规范）
+│   ├── progress/                 # 任务进度追踪
+│   └── data.db                  # SQLite 数据存储
+├── .github/workflows/
+│   └── harness-ci.yml           # ← CI 配置
+├── .pre-commit-config.yaml       # ← pre-commit 配置
+├── skills/                       # ← Skill 定义
 │   ├── code-review/
 │   ├── architecture-lint/
 │   └── cleanup/
 ├── examples/                      # ← 示例项目
-│   ├── run-demo.sh              # 演示脚本
-│   └── drg-helper/              # DRG 分组助手示例
-└── docs/                         # 知识库
+│   ├── run-demo.sh
+│   └── drg-helper/
+├── docs/                         # ← 知识库
+│   ├── medical/                  # 医疗领域知识
+│   ├── IMPLEMENTATION_STATUS.md # 对标分析
+│   └── WORKFLOW_EXAMPLE.md     # 工作流示例
+└── src/                         # 业务代码
 ```
 
-## 核心概念
+## 新增功能
 
-### 1. Skill 结构（AgentSkills 规范）
-每个 Skill 包含：
-- `SKILL.md` - 入口文件（YAML frontmatter + 简洁说明）
-- `scripts/` - 可执行代码
-- `references/` - 参考资料（按需加载）
+### ✅ CI/CD 集成
+- GitHub Actions 自动运行 lint + test + cleanup
+- pre-commit hook 本地检查
 
-### 2. 约束换自主
-- 规矩越明确 → Agent 独立做的事越多
-- Linter 规则必须强制执行
-- Review 流程必须闭环
+### ✅ MCP 工具扩展
+- 文件系统（读写）
+- 浏览器自动化
+- SQLite 数据库
+- Git 操作
+- 代码搜索
 
-### 3. 进度追踪
-每个复杂任务创建 `.harness/progress/` 下的追踪文件。
+### ✅ 知识库
+- 医疗健康领域知识（ICD-10, ICD-9-CM-3, DRG）
+- 工作流示例（完整任务流程）
 
-## 示例项目
+## 使用流程
 
-### DRG Helper - 诊断相关分组助手
-
-一个展示完整 Harness 工程流程的示例项目。
-
-**功能**：根据患者诊断和手术信息自动计算 DRG 分组
-
-**技术栈**：Python + FastAPI + SQLite
-
-**目录结构**：
-```
-examples/drg-helper/
-├── src/
-│   ├── api/main.py              # FastAPI 服务
-│   └── models/drg.py            # DRG 分组逻辑
-├── tests/
-│   └── test_drg.py              # 单元测试
-├── docs/
-│   └── drg-rules.md             # DRG 规则文档
-└── requirements.txt
-```
-
-**运行演示**：
+### 1. 本地开发
 ```bash
-# 方式1: 一键演示
-bash examples/run-demo.sh
+# 编写代码
+vim src/models/drg.py
 
-# 方式2: 逐步执行
-cd examples/drg-helper
-pip install -r requirements.txt
-
-# 代码审查
-python ../../skills/code-review/scripts/run_review.py --files src/ --mode full
-
-# 架构检查
-python ../../skills/architecture-lint/scripts/run_all.py --strict
-
-# 运行测试
-python -m pytest tests/ -v
+# pre-commit 自动检查
+git add .
+git commit  # 自动触发 lint + review
 ```
 
-## Skills
-
-### code-review
-代码审查技能
+### 2. 代码审查
 ```bash
-python skills/code-review/scripts/run_review.py --files src/main.py
+python skills/code-review/scripts/run_review.py --files src/
 ```
 
-### architecture-lint
-架构约束检查
+### 3. 架构检查
 ```bash
 python skills/architecture-lint/scripts/run_all.py --strict
 ```
 
-### cleanup
-代码库清洁
+### 4. 运行测试
 ```bash
-python skills/cleanup/scripts/cleanup.py --auto-fix
+cd examples/drg-helper
+python -m pytest tests/ -v
+```
+
+### 5. 清理检查
+```bash
+python skills/cleanup/scripts/cleanup.py --check-only
 ```
 
 ## 文档
 
 - [Harness 配置](.harness/config.yaml)
-- [Code Review Skill](skills/code-review/SKILL.md)
-- [Architecture Lint Skill](skills/architecture-lint/SKILL.md)
-- [Cleanup Skill](skills/cleanup/SKILL.md)
-- [DRG 规则文档](examples/drg-helper/docs/drg-rules.md)
+- [MCP 配置](.claude/config.json)
+- [CI 配置](.github/workflows/harness-ci.yml)
+- [Pre-commit 配置](.pre-commit-config.yaml)
+- [实现对标](docs/IMPLEMENTATION_STATUS.md)
+- [工作流示例](docs/WORKFLOW_EXAMPLE.md)
+- [医疗知识库](docs/medical/README.md)
