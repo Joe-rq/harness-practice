@@ -22,38 +22,35 @@ claude
 
 ```
 .
-├── AGENTS.md                 # ← 入口：目录地图
+├── AGENTS.md                      # ← 入口：目录地图
 ├── .claude/
-│   ├── config.json           # MCP 配置
-│   └── settings.json         # Claude Code 设置
+│   └── config.json                # MCP 配置
 ├── .harness/
-│   ├── config.yaml           # Harness 全局配置
-│   ├── lint-rules/           # Linter 规则
-│   ├── context/              # 动态上下文
-│   └── prompts/              # 提示词模板
-├── docs/                    # 知识库
-│   ├── architecture/         # 架构文档
-│   ├── domains/              # 业务域文档
-│   ├── plans/                # 执行计划
-│   ├── specs/                # 产品规格
-│   └── runbooks/             # 操作手册
-├── skills/                   # Skill 定义
+│   ├── config.yaml               # Harness 全局配置
+│   └── progress/                 # 任务进度追踪
+├── skills/                        # ← Skill 定义（符合 AgentSkills 规范）
 │   ├── code-review/
-│   │   └── SKILL.md
+│   │   ├── SKILL.md             # 入口
+│   │   ├── scripts/             # 可执行脚本
+│   │   └── references/          # 参考资料
 │   ├── architecture-lint/
-│   │   └── SKILL.md
+│   │   ├── SKILL.md
+│   │   ├── scripts/
+│   │   └── references/
 │   └── cleanup/
-│       └── SKILL.md
-└── src/                     # 业务代码
+│       ├── SKILL.md
+│       ├── scripts/
+│       └── references/
+└── docs/                         # 知识库
 ```
 
 ## 核心概念
 
-### 1. AGENTS.md 当地图
-AGENTS.md 不是百科全书，而是"目录地图"。告诉 Agent：
-- 项目结构是怎样的
-- 关键文档在哪
-- 遇到问题找谁/找什么
+### 1. Skill 结构（AgentSkills 规范）
+每个 Skill 包含：
+- `SKILL.md` - 入口文件（YAML frontmatter + 简洁说明）
+- `scripts/` - 可执行代码
+- `references/` - 参考资料（按需加载）
 
 ### 2. 约束换自主
 - 规矩越明确 → Agent 独立做的事越多
@@ -61,50 +58,31 @@ AGENTS.md 不是百科全书，而是"目录地图"。告诉 Agent：
 - Review 流程必须闭环
 
 ### 3. 进度追踪
-每个复杂任务创建 `.harness/progress/` 下的追踪文件：
-```yaml
-# .harness/progress/{task-id}.yaml
-task: "功能名称"
-status: "in_progress"  # pending / in_progress / done / failed
-completed_steps:
-  - "步骤1"
-  - "步骤2"
-next_step: "步骤3"
-blockers: []
-```
+每个复杂任务创建 `.harness/progress/` 下的追踪文件。
 
-## 常用命令
-
-```bash
-# 运行架构检查
-make lint
-
-# 运行测试
-make test
-
-# 触发清洁 Agent
-make clean
-
-# 生成进度报告
-make report
-```
-
-## Skill 参考
+## Skills
 
 ### code-review
-- 触发：文件变更 > 100 行
-- 执行：安全扫描 → 架构合规 → 测试覆盖
+代码审查技能
+```bash
+python skills/code-review/scripts/run_review.py --files src/main.py
+```
 
 ### architecture-lint
-- 触发：每次提交
-- 执行：层级依赖检查 → 命名规范 → 安全检查
+架构约束检查
+```bash
+python skills/architecture-lint/scripts/run_all.py --strict
+```
 
 ### cleanup
-- 触发：每周定时
-- 执行：文档一致性 → 架构违规 → 重复模式
+代码库清洁
+```bash
+python skills/cleanup/scripts/cleanup.py --auto-fix
+```
 
 ## 文档
 
 - [Harness 配置](.harness/config.yaml)
-- [Linter 规则](.harness/lint-rules/README.md)
-- [Skill 定义](skills/)
+- [Code Review Skill](skills/code-review/SKILL.md)
+- [Architecture Lint Skill](skills/architecture-lint/SKILL.md)
+- [Cleanup Skill](skills/cleanup/SKILL.md)
