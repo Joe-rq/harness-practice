@@ -30,17 +30,11 @@ claude
 │   └── progress/                 # 任务进度追踪
 ├── skills/                        # ← Skill 定义（符合 AgentSkills 规范）
 │   ├── code-review/
-│   │   ├── SKILL.md             # 入口
-│   │   ├── scripts/             # 可执行脚本
-│   │   └── references/          # 参考资料
 │   ├── architecture-lint/
-│   │   ├── SKILL.md
-│   │   ├── scripts/
-│   │   └── references/
 │   └── cleanup/
-│       ├── SKILL.md
-│       ├── scripts/
-│       └── references/
+├── examples/                      # ← 示例项目
+│   ├── run-demo.sh              # 演示脚本
+│   └── drg-helper/              # DRG 分组助手示例
 └── docs/                         # 知识库
 ```
 
@@ -59,6 +53,48 @@ claude
 
 ### 3. 进度追踪
 每个复杂任务创建 `.harness/progress/` 下的追踪文件。
+
+## 示例项目
+
+### DRG Helper - 诊断相关分组助手
+
+一个展示完整 Harness 工程流程的示例项目。
+
+**功能**：根据患者诊断和手术信息自动计算 DRG 分组
+
+**技术栈**：Python + FastAPI + SQLite
+
+**目录结构**：
+```
+examples/drg-helper/
+├── src/
+│   ├── api/main.py              # FastAPI 服务
+│   └── models/drg.py            # DRG 分组逻辑
+├── tests/
+│   └── test_drg.py              # 单元测试
+├── docs/
+│   └── drg-rules.md             # DRG 规则文档
+└── requirements.txt
+```
+
+**运行演示**：
+```bash
+# 方式1: 一键演示
+bash examples/run-demo.sh
+
+# 方式2: 逐步执行
+cd examples/drg-helper
+pip install -r requirements.txt
+
+# 代码审查
+python ../../skills/code-review/scripts/run_review.py --files src/ --mode full
+
+# 架构检查
+python ../../skills/architecture-lint/scripts/run_all.py --strict
+
+# 运行测试
+python -m pytest tests/ -v
+```
 
 ## Skills
 
@@ -86,3 +122,4 @@ python skills/cleanup/scripts/cleanup.py --auto-fix
 - [Code Review Skill](skills/code-review/SKILL.md)
 - [Architecture Lint Skill](skills/architecture-lint/SKILL.md)
 - [Cleanup Skill](skills/cleanup/SKILL.md)
+- [DRG 规则文档](examples/drg-helper/docs/drg-rules.md)
