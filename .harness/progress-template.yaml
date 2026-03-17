@@ -1,0 +1,33 @@
+# 进度追踪模板
+
+task: ""
+status: "pending"  # pending / in_progress / done / failed
+
+# 任务描述
+description: ""
+
+# 相关文件
+files: []
+
+# 完成步骤
+completed_steps: []
+
+# 下一步
+next_step: ""
+
+# 阻塞问题
+blockers: []
+
+# 关键决策
+decisions: []
+
+# 验证结果
+verification:
+  passed: null
+  tests_run: null
+  issues: []
+
+# 时间追踪
+created_at: ""
+updated_at: ""
+completed_at: ""

@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+.harness/logs/*.log
+
+# Database
+.harness/data.db
+
+# Coverage
+.coverage
+htmlcov/
+*.cover
+
+# Environment
+.env
+.env.local
+
+# Build
+dist/
+build/
+*.egg-info/

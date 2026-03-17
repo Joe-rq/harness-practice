@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./src"],
+      "description": "文件系统访问 - 读写项目代码"
+    },
+    "filesystem-readonly": {
+      "command": "npx", 
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./docs"],
+      "description": "只读文件系统 - 访问文档"
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "description": "浏览器自动化 - UI 验证截图"
+    },
+    "sqlite": {
+      "command": "python",
+      "args": ["-m", "mcp_server_sqlite", "--db-path", "./.harness/data.db"],
+      "description": "SQLite 数据库 - 存储进度和元数据"
+    }
+  },
+  "tools": {
+    "Bash": {
+      "enabled": true,
+      "timeout": 300
+    },
+    "Edit": {
+      "enabled": true
+    },
+    "Read": {
+      "enabled": true,
+      "allowedDirectories": ["./src", "./docs", "./.harness"]
+    },
+    "Write": {
+      "enabled": true,
+      "allowedDirectories": ["./src", "./docs", "./.harness"]
+    }
+  },
+  "hooks": {
+    "preCommit": [
+      "make lint",
+      "make test"
+    ],
+    "postReview": [
+      "make report"
+    ]
+  }
+}

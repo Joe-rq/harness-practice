@@ -1,0 +1,143 @@
+# Harness Engineering 配置
+
+## 全局设置
+
+```yaml
+version: "1.0"
+name: "harness-practice"
+description: "Harness Engineering 实践项目"
+
+## 模型设置
+model:
+  provider: "anthropic"
+  model: "claude-sonnet-4-20250514"
+  maxTokens: 100000
+  temperature: 0.7
+
+## 推理策略
+reasoning:
+  planning: "xhigh"    # 规划阶段用深度推理
+  execution: "high"     # 执行阶段用标准推理
+  verification: "xhigh" # 验证阶段用深度推理
+
+## 工作流配置
+workflow:
+  ## Plan-Build-Verify-Fix 闭环
+  preCompletionCheck: true
+  requireTestBeforeComplete: true
+  requireVerificationBeforeComplete: true
+  
+  ## 死循环检测
+  loopDetection:
+    enabled: true
+    maxEditsPerFile: 5
+    warningMessage: "Consider rethinking your approach"
+
+## 上下文配置
+context:
+  ## 注入环境信息
+  environmentInjection:
+    enabled: true
+    include:
+      - directoryStructure
+      - availableTools
+      - timeoutSettings
+      - evaluationCriteria
+      
+  ## 进度文件
+  progressFile:
+    enabled: true
+    path: ".harness/progress"
+    template: "progress-template.yaml"
+
+## 架构约束
+architecture:
+  ## 层级依赖规则
+  layerDependency:
+    enabled: true
+    layers:
+      - name: "UI"
+        canImport: ["Runtime", "Service", "Repo", "Config", "Types"]
+      - name: "Runtime"
+        canImport: ["Service", "Repo", "Config", "Types"]
+      - name: "Service"
+        canImport: ["Repo", "Config", "Types"]
+      - name: "Repo"
+        canImport: ["Config", "Types"]
+      - name: "Config"
+        canImport: ["Types"]
+      - name: "Types"
+        canImport: []
+        
+  ## 自定义 Linter 规则
+  customLintRules:
+    enabled: true
+    rulesDir: ".harness/lint-rules"
+
+## 审查配置
+review:
+  ## Agent 互审
+  agentReview:
+    enabled: true
+    modes:
+      - name: "eng-review"
+        trigger: "*.py,*.ts,*.js"
+        checks:
+          - "security-scan"
+          - "architecture-compliance"
+          - "test-coverage"
+          
+      - name: "ceo-review"
+        trigger: "PR size > 500 lines"
+        checks:
+          - "architecture-approval"
+          - "performance-impact"
+          - "breaking-changes"
+
+## 清理配置
+cleanup:
+  ## 定期清洁 Agent
+  scheduledCleanup:
+    enabled: true
+    frequency: "weekly"
+    tasks:
+      - name: "doc-code-consistency"
+        description: "检查文档与代码一致性"
+        
+      - name: "architecture-violation"
+        description: "扫描架构违规"
+        
+      - name: "duplicate-pattern"
+        description: "检测重复代码模式"
+
+## 可观测性
+observability:
+  ## 日志配置
+  logging:
+    level: "info"
+    output: ".harness/logs"
+    agentReadable: true
+    
+  ## 验证任务
+  verificationTasks:
+    enabled: true
+    tasks:
+      - name: "service-startup"
+        command: "curl -w '%{time_total}' http://localhost:8080/health"
+        threshold: "0.8s"
+        
+      - name: "ui-render"
+        command: "playwright test --ui"
+        screenshot: true
+
+## 进度追踪
+progress:
+  ## 全标失败策略
+  failByDefault:
+    enabled: true
+    description: "所有功能的初始状态标记为失败，Agent 必须主动标记完成"
+    
+  ## 每次只做一件事
+  singleTaskMode:
+    enabled: true
+    description: "强制一次只完成一个子任务"

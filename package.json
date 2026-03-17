@@ -1,0 +1,19 @@
+{
+  "name": "harness-practice",
+  "version": "1.0.0",
+  "description": "Harness Engineering 实践项目 - 基于 Claude Code",
+  "scripts": {
+    "lint": "python .harness/lint-rules/run_all.py",
+    "test": "pytest tests/ -v",
+    "clean": "python -m .harness.tasks.cleanup --auto-fix",
+    "report": "python .harness/scripts/generate_report.py"
+  },
+  "keywords": [
+    "harness-engineering",
+    "claude-code",
+    "ai-agent",
+    "agentic"
+  ],
+  "author": "",
+  "license": "MIT"
+}
